@@ -19,7 +19,8 @@
             overflow-x: hidden;
             overscroll-behavior-y: none;
         }
-        /* --- 修改重點開始：Header 排版優化 --- */
+        
+        /* Header 樣式 (電腦版與手機版通用) */
         .header-banner {
             background: rgba(30, 58, 138, 0.95);
             backdrop-filter: blur(10px);
@@ -31,38 +32,27 @@
             z-index: 50;
             display: flex;
             align-items: center;
-            /* 關鍵指令：讓 Logo 靠左，文字靠右 */
-            justify-content: space-between; 
+            justify-content: space-between; /* Logo 靠左，文字靠右 */
             padding: 0.75rem 1rem;
         }
         .header-logo {
             height: 40px; 
             width: auto;
-            /* 移除原本的 margin-right，因為已經用 space-between 分開了 */
         }
         .header-text {
             color: white;
             font-weight: 500;
             letter-spacing: 0.05em;
-            font-size: 1rem; /* 電腦版預設字體大小 */
-            
-            /* 關鍵指令：強制文字不換行 */
-            white-space: nowrap; 
+            font-size: 1rem;
+            white-space: nowrap; /* 強制標題不換行 */
             text-align: right;
         }
 
-        /* RWD 針對手機版 (寬度小於 480px) 的調整 */
+        /* 針對超小手機螢幕的微調 */
         @media (max-width: 480px) {
-            .header-text {
-                /* 手機版字體縮小，確保一整行塞得下，不會掉字 */
-                font-size: 0.75rem; 
-            }
-            .header-logo {
-                /* 手機版 Logo 稍微縮小一點點，讓空間更寬裕 */
-                height: 32px; 
-            }
+            .header-text { font-size: 0.75rem; }
+            .header-logo { height: 32px; }
         }
-        /* --- 修改重點結束 --- */
         
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
@@ -186,9 +176,9 @@
                 </div>
 
                 <div>
-                    <div class="flex justify-between items-center mb-2">
+                    <div class="flex flex-wrap justify-between items-end mb-2 gap-y-1">
                         <label class="block text-blue-200 text-sm">身分證字號 (ID Number)</label>
-                        <label class="flex items-center text-blue-300 text-xs cursor-pointer hover:text-blue-100 transition">
+                        <label class="flex items-center text-blue-300 text-xs cursor-pointer hover:text-blue-100 transition whitespace-nowrap">
                             <input type="checkbox" id="isOverseas" class="custom-checkbox mr-2 w-4 h-4 rounded border-gray-500 bg-gray-700 focus:ring-offset-gray-800 focus:ring-2">
                             海外人士 (無台灣身分證)
                         </label>
