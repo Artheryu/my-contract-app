@@ -19,9 +19,9 @@
             overflow-x: hidden;
             overscroll-behavior-y: none;
         }
-        /* 修改：Header 樣式，支援 Logo 排版 */
+        /* --- 修改重點開始：Header 排版優化 --- */
         .header-banner {
-            background: rgba(30, 58, 138, 0.95); /* 加深背景不透明度 */
+            background: rgba(30, 58, 138, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: fixed;
@@ -31,19 +31,38 @@
             z-index: 50;
             display: flex;
             align-items: center;
+            /* 關鍵指令：讓 Logo 靠左，文字靠右 */
+            justify-content: space-between; 
             padding: 0.75rem 1rem;
         }
         .header-logo {
-            height: 40px; /* 設定 Logo 高度 */
+            height: 40px; 
             width: auto;
-            margin-right: 12px;
+            /* 移除原本的 margin-right，因為已經用 space-between 分開了 */
         }
         .header-text {
             color: white;
             font-weight: 500;
             letter-spacing: 0.05em;
-            font-size: 1rem;
+            font-size: 1rem; /* 電腦版預設字體大小 */
+            
+            /* 關鍵指令：強制文字不換行 */
+            white-space: nowrap; 
+            text-align: right;
         }
+
+        /* RWD 針對手機版 (寬度小於 480px) 的調整 */
+        @media (max-width: 480px) {
+            .header-text {
+                /* 手機版字體縮小，確保一整行塞得下，不會掉字 */
+                font-size: 0.75rem; 
+            }
+            .header-logo {
+                /* 手機版 Logo 稍微縮小一點點，讓空間更寬裕 */
+                height: 32px; 
+            }
+        }
+        /* --- 修改重點結束 --- */
         
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
@@ -154,7 +173,7 @@
     <div class="w-full max-w-3xl relative main-container">
         <div id="step1" class="glass-card rounded-2xl p-8 md:p-10 fade-in">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-white mb-2 tracking-wide">保 密 協 議 簽 署</h1>
+                <h1 class="text-3xl font-bold text-white mb-2 tracking-wide">保密協議簽署</h1>
                 <p class="text-blue-200 text-sm">Step 1 / 2 : 請填寫基本資料</p>
             </div>
             <form id="infoForm" class="space-y-6">
@@ -348,13 +367,6 @@
             if (val.length > 10) val = val.slice(0, 10);
             e.target.value = val.length > 7 ? val.slice(0,4)+'-'+val.slice(4,7)+'-'+val.slice(7) : (val.length > 4 ? val.slice(0,4)+'-'+val.slice(4) : val);
         });
-
-        // 【關鍵修改】移除這個監聽器，解決中文輸入法被擋住的問題
-        /*
-        document.getElementById('inputName').addEventListener('input', function(e) {
-             this.value = this.value.replace(/[^\u4e00-\u9fa5a-zA-Z\s]/g, '');
-        });
-        */
 
         // 流程切換 (表單送出)
         infoForm.addEventListener('submit', (e) => {
