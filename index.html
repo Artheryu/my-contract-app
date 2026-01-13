@@ -73,6 +73,10 @@
                     <p class="text-blue-400 text-[10px] mb-1">💡 簽署完後副本將寄至此，請確保填寫正確。</p>
                     <input type="email" id="inputEmail" required class="glass-input" placeholder="example@email.com">
                 </div>
+                <div>
+                    <label class="block text-blue-200 text-xs mb-1">通訊地址 (Address) <span class="text-red-400">*</span></label>
+                    <input type="text" id="inputAddress" required class="glass-input" placeholder="請輸入完整通訊地址">
+                </div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all mt-2">
                     下一步：預覽合約內容
                 </button>
@@ -84,7 +88,7 @@
             <div class="text-center mb-6">
                 <h2 class="text-xl font-bold text-gray-900 border-b-2 border-black inline-block pb-1">保 密 協 議 書</h2>
             </div>
-            <div id="contractDisplay" class="contract-content text-gray-800 mb-8"></div>
+            <div id="contractDisplay" class="contract-content text-gray-800 mb-8 font-serif"></div>
             <div class="border-t pt-6 space-y-4">
                 <p class="text-sm"><strong>立書人姓名：</strong> <span id="displayName" class="underline font-bold"></span></p>
                 <div>
@@ -100,13 +104,11 @@
     </div>
 
     <script>
-        // 設定後端與資料路徑
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxBEMq10DZ9M2JQVM1VkTSv463c4X_HfyL8tNT52_3UjIEagemn6DuF2wU0ZIEmVwUK8g/exec"; 
         const DATA_URL = "./data.json"; 
         
         let whitelist = {}, fullContractText = "", isDataLoaded = false, isWaiting = false;
 
-        // 🚀 極速預載
         (async function preload() {
             try {
                 const res = await fetch(DATA_URL + "?t=" + Date.now());
@@ -121,7 +123,6 @@
             }
         })();
 
-        // 海外身分證切換
         const isOverseas = document.getElementById('isOverseas');
         const inputID = document.getElementById('inputID');
         isOverseas.onchange = function() {
@@ -141,7 +142,6 @@
             signaturePad.clear();
         }
 
-        // 台灣身分證驗證
         function validateID(id) {
             if (isOverseas.checked) return true;
             if (!/^[A-Z][1-2]\d{8}$/.test(id)) return false;
@@ -169,7 +169,6 @@
             else isWaiting = true;
         };
 
-        // 核心跳轉邏輯 (自動替換標籤)
         function proceedToStep2() {
             const date = document.getElementById('inputDate').value.trim();
             const overlay = document.getElementById('loadingOverlay');
@@ -181,7 +180,7 @@
                 return;
             }
 
-            // 💡 替換合約標籤
+            // 💡 替換合約標籤 (修正全域替換)
             let previewText = fullContractText;
             const now = new Date();
             const rocYear = now.getFullYear() - 1911;
@@ -190,13 +189,12 @@
             previewText = previewText.replace(/{{ID}}/g, document.getElementById('inputID').value);
             previewText = previewText.replace(/{{Phone}}/g, document.getElementById('inputPhone').value);
             previewText = previewText.replace(/{{Email}}/g, document.getElementById('inputEmail').value);
+            previewText = previewText.replace(/{{Address}}/g, document.getElementById('inputAddress').value);
             previewText = previewText.replace(/{{Year}}/g, rocYear);
             previewText = previewText.replace(/{{Month}}/g, now.getMonth() + 1);
             previewText = previewText.replace(/{{Day}}/g, now.getDate());
-            // 處理簽名標籤預覽（顯示為空白，因為還沒簽）
-            previewText = previewText.replace(/{{Signature}}/g, "\n(請於下方簽名)\n");
+            previewText = previewText.replace(/{{Signature}}/g, "\n(簽名處)\n");
 
-            // 成功跳轉
             document.getElementById('displayName').innerText = document.getElementById('inputName').value;
             document.getElementById('contractDisplay').innerText = previewText;
             document.getElementById('step1').style.display = 'none';
@@ -210,7 +208,7 @@
         document.getElementById('clearBtn').onclick = () => signaturePad.clear();
 
         document.getElementById('finalSubmitBtn').onclick = async function() {
-            if (signaturePad.isEmpty()) { Swal.fire({ icon: 'warning', title: '請填寫簽名' }); return; }
+            if (signaturePad.isEmpty()) { Swal.fire({ icon: 'warning', title: '請先完成簽名' }); return; }
             
             document.getElementById('loadingOverlay').style.display = 'flex';
             document.getElementById('loadingText').innerText = "加密傳輸中，請勿關閉視窗...";
@@ -221,6 +219,7 @@
                 id: inputID.value,
                 phone: document.getElementById('inputPhone').value,
                 email: document.getElementById('inputEmail').value,
+                address: document.getElementById('inputAddress').value,
                 signature_base64: signaturePad.toDataURL()
             };
 
@@ -228,7 +227,6 @@
                 const res = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const result = await res.json();
                 document.getElementById('loadingOverlay').style.display = 'none';
-                
                 if (result.status === 'success') {
                     Swal.fire({ icon: 'success', title: '簽署完成', text: '合約副本已寄送至您的信箱', allowOutsideClick: false })
                     .then(() => location.reload());
